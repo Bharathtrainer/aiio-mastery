@@ -47,10 +47,12 @@ If you buy a domain like `aiiomastery.com`:
 ## How the Payment Flow Works
 
 1. Visitor lands on `index.html` (landing page)
-2. Clicks any "Get Access" button → goes to your Razorpay payment page:
-   https://pages.razorpay.com/pl_SQROgucJkpkxt5/view
-3. After payment, you manually send them the simulator link via email/WhatsApp
-4. Simulator link: https://nbharathtrainer.github.io/aiio-mastery/simulator.html
+2. Clicks any "Get Access" button → goes to your Razorpay payment page (example):
+   https://rzp.io/rzp/rJthAubX
+3. After payment, Razorpay should redirect the customer to your simulator page. Configure your Razorpay Payment Page's **Success URL** to:
+   `https://bharathtrainer.github.io/aiio-mastery/simulator.html?paid=1`
+   (or `...?razorpay_payment_id=...`)
+4. Simulator link: https://bharathtrainer.github.io/aiio-mastery/simulator.html
 
 ### To Automate Access (Future Enhancement):
 - Option A: Set up Razorpay webhook to auto-email the simulator link
