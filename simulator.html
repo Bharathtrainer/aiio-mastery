@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NVIDIA AIIO Exam Mastery — By Bharath Nelapatla</title>
+<title>NVIDIA AIIO Exam Mastery</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -824,6 +824,22 @@ body::before {
   </div>
 </div>
 
+<!-- ============ ACCESS GATE ============ -->
+<div id="accessGate" style="position:fixed;inset:0;background:var(--bg-primary);z-index:600;display:flex;align-items:center;justify-content:center;">
+  <div style="text-align:center;max-width:480px;padding:40px;">
+    <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+    <div style="font-size:1.6rem;font-weight:800;margin-bottom:12px;">AIIO Exam Mastery</div>
+    <div id="gateMessage" style="font-size:0.95rem;color:var(--text-secondary);line-height:1.7;margin-bottom:28px;">This is a paid product. Please purchase access to use the exam simulator.</div>
+    <a href="https://bharathtrainer.github.io/aiio-mastery/" class="action-btn primary" style="text-decoration:none;display:inline-flex;font-size:1rem;padding:14px 32px;">Get Access — ₹199</a>
+    <div style="margin-top:24px;font-size:0.85rem;color:var(--text-muted);">Already purchased? Enter your access key:</div>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;">
+      <input type="text" id="accessKeyInput" placeholder="Enter access key" style="padding:10px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:0.9rem;width:200px;outline:none;" onkeypress="if(event.key==='Enter')validateKey()">
+      <button onclick="validateKey()" class="nav-btn primary-btn" style="padding:10px 20px;">Unlock</button>
+    </div>
+    <div id="keyError" style="color:var(--danger);font-size:0.82rem;margin-top:8px;display:none;">Invalid access key. Please check and try again.</div>
+  </div>
+</div>
+
 <!-- ============ WELCOME SCREEN (after payment) ============ -->
 <div id="welcomeScreen" style="display:none;position:fixed;inset:0;background:rgba(10,10,15,0.95);z-index:500;display:flex;align-items:center;justify-content:center;">
   <div style="text-align:center;max-width:500px;padding:40px;animation:fadeInUp 0.6s ease">
@@ -856,7 +872,7 @@ body::before {
     <div class="hero">
       <div class="hero-title fade-in">Master NVIDIA <span>AIIO</span><br>Certification</div>
       <div class="hero-sub fade-in-delay-1">Gamified exam simulator with 170+ questions across all 3 domains. Practice like the real NCA-AIIO exam — 50 questions, 60 minutes, passing score 70%.</div>
-      <div class="hero-instructor fade-in-delay-2">Created by <strong>Bharath Nelapatla</strong> — NVIDIA Certified Associate | AI Infrastructure & Operations</div>
+      <div class="hero-instructor fade-in-delay-2">Created by an <strong>NVIDIA Certified Associate</strong> | AI Infrastructure & Operations</div>
     </div>
 
     <div class="stats-row fade-in-delay-2">
@@ -935,7 +951,7 @@ body::before {
     <div class="badges-grid" id="badgesGrid"></div>
 
     <div class="footer">
-      <p>Built with expertise by <a href="#">Bharath Nelapatla</a> — NVIDIA Certified Associate: AI Infrastructure & Operations</p>
+      <p>AIIO Exam Mastery — Not affiliated with NVIDIA Corporation. For exam preparation purposes only.</p>
       <p style="margin-top:8px;">Not affiliated with NVIDIA Corporation. For exam preparation purposes only.</p>
     </div>
   </div>
@@ -1619,26 +1635,79 @@ function reviewExam() {
   renderQuestion();
 }
 
-// ======================= WELCOME SCREEN =======================
+// ======================= ACCESS CONTROL =======================
+// Valid access keys — add new keys here for each batch of customers
+const VALID_KEYS = ['AIIO2026', 'NVMASTER', 'GPUREADY', 'AIINFRA26'];
+
+// Token that Razorpay appends OR you can share with customers
+const VALID_TOKENS = ['paid', 'access', 'rzp_success'];
+
+function checkAccess() {
+  const gate = document.getElementById('accessGate');
+  const params = new URLSearchParams(window.location.search);
+
+  // Check 1: Has a valid token in URL (from Razorpay redirect or shared link)
+  const token = params.get('key') || params.get('status') || params.get('paid');
+  if (token && (VALID_TOKENS.includes(token) || VALID_KEYS.includes(token.toUpperCase()))) {
+    grantAccess(true);
+    return;
+  }
+
+  // Check 2: Coming from Razorpay
+  if (document.referrer.includes('razorpay.com')) {
+    grantAccess(true);
+    return;
+  }
+
+  // Check 3: Previously unlocked in this browser
+  try {
+    if (localStorage.getItem('aiio_access') === 'granted') {
+      grantAccess(false);
+      return;
+    }
+  } catch(e) {}
+
+  // No valid access — show gate
+  gate.style.display = 'flex';
+}
+
+function grantAccess(showWelcome) {
+  document.getElementById('accessGate').style.display = 'none';
+  try { localStorage.setItem('aiio_access', 'granted'); } catch(e) {}
+  if (showWelcome) {
+    const welcomed = sessionStorage.getItem('aiio_welcomed');
+    if (!welcomed) {
+      document.getElementById('welcomeScreen').style.display = 'flex';
+    } else {
+      document.getElementById('welcomeScreen').style.display = 'none';
+    }
+  } else {
+    document.getElementById('welcomeScreen').style.display = 'none';
+  }
+}
+
+function validateKey() {
+  const input = document.getElementById('accessKeyInput').value.trim().toUpperCase();
+  if (VALID_KEYS.includes(input)) {
+    grantAccess(true);
+  } else {
+    document.getElementById('keyError').style.display = 'block';
+    document.getElementById('accessKeyInput').style.borderColor = 'var(--danger)';
+    setTimeout(() => {
+      document.getElementById('keyError').style.display = 'none';
+      document.getElementById('accessKeyInput').style.borderColor = 'var(--border)';
+    }, 3000);
+  }
+}
+
 function dismissWelcome() {
   document.getElementById('welcomeScreen').style.display = 'none';
   try { sessionStorage.setItem('aiio_welcomed', '1'); } catch(e) {}
 }
 
-function checkWelcome() {
-  const welcomed = sessionStorage.getItem('aiio_welcomed');
-  const fromPayment = document.referrer.includes('razorpay') || window.location.search.includes('paid=1');
-  const ws = document.getElementById('welcomeScreen');
-  if (!welcomed && (fromPayment || !document.referrer)) {
-    ws.style.display = 'flex';
-  } else {
-    ws.style.display = 'none';
-  }
-}
-
 // ======================= INIT =======================
 updateDashboard();
-checkWelcome();
+checkAccess();
 </script>
 </body>
 </html>
