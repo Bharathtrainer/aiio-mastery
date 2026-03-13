@@ -2,10 +2,10 @@
 
 Gamified exam simulator for the NVIDIA NCA-AIIO (AI Infrastructure & Operations) certification.
 
-**170+ practice questions** across all 3 exam domains with gamification (XP, levels, badges).
+**210+ practice questions** across all 3 exam domains with gamification (XP, levels, badges).
 
 ## Live Site
-🔗 **https://bharathtrainer.github.io/aiio-mastery/**
+🔗 **[https://nbharathtrainer.github.io/aiio-mastery/](https://nbharathtrainer.github.io/aiio-mastery/)**
 
 ## Files
 - `index.html` — Landing/sales page
